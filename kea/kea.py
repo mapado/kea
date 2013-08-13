@@ -28,12 +28,12 @@
 
 :Usage:
     A typical usage of this module is sample:
-    
+
         >>> import kea
         >>> sentence = "Le Kea est le seul perroquet alpin au monde."
         >>> keatokenizer = kea.tokenizer()
         >>> tokens = keatokenizer.tokenize(sentence)
-        ['Le', 'Kea', 'est', 'le', 'seul', 'perroquet', 'alpin', 'au', 'monde', 
+        ['Le', 'Kea', 'est', 'le', 'seul', 'perroquet', 'alpin', 'au', 'monde',
         '.']
 """
 
@@ -41,19 +41,16 @@ import os
 import re
 import codecs
 
-#~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-# [ tokenizer
-#~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-class tokenizer:
+
+class Tokenizer(object):
     """ The Kea Tokenizer is a rule-based tokenizer for french. """
 
-    #-T-----------------------------------------------------------------------T-
     def __init__(self):
         """ Constructs a new tokenizer. """
-        
+
         self.resources = os.path.dirname(__file__) + '/resources/'
         """ The path of the resources folder. """
-        
+
         self.lexicon = {}
         """ The dictionary containing the lexicon. """
 
@@ -65,41 +62,29 @@ class tokenizer:
         | \w+                                           # Les mots pleins
         | [^\w\s]                                       # -
         """)
-        
-        self.loadlist(self.resources+'abbrs.list')
-        """ Loads the default lexicon (path is /resources/abbrs.list). """
-        
-        self.loadlist(self.resources+'villes.list')
-        """ Loads the city lexicon (path is /resources/villes.list). """
-    #-B-----------------------------------------------------------------------B-
 
+        self.loadlist(self.resources+'abbrs-wikipedia.list')
 
-    #-T-----------------------------------------------------------------------T-
     def tokenize(self, text):
         """
-        Tokenize the sentence given in parameter and return a list of tokens. 
+        Tokenize the sentence given in parameter and return a list of tokens.
         This is a two-steps process: 1. tokenize text using punctuation marks,
-        2. merge over-tokenized units using the lexicon or a regex (for 
+        2. merge over-tokenized units using the lexicon or a regex (for
         compounds, '^[A-Z][a-z]+-[A-Z][a-z]+$').
         """
-        
-        #=======================================================================
+
         # STEP 1 : tokenize with punctuation
-        #=======================================================================
         text = text.replace(u'\u2019', '\'')
         tokens = self.regexp.findall(text)
-        
-        #=======================================================================
+
         # STEP 2 : merge over-tokenized units using the lexicons
-        #=======================================================================
-        
         # A temporary list used for merging tokens
         tmp_list = []
         # First counter
         i = 0
         # Second counter
         j = 0
-        
+
         # Loop and search for mis-tokenized tokens
         while i < len(tokens):
             # The second counter indicates the ending character
@@ -121,7 +106,7 @@ class tokenizer:
                     # Replace the i-th token by the candidate
                     tokens[i] = candidate
                     # Stop the candidate construction
-                    break                    
+                    break
                 # Increment second counter
                 j += 1
             # Add the token to the temporary list
@@ -130,25 +115,18 @@ class tokenizer:
             i += 1
         # Return the tokenized text
         return tmp_list
-    #-B-----------------------------------------------------------------------B-    
-    
-    
-    #-T-----------------------------------------------------------------------T-
-    def loadlist(self, path):
-        """ Load a resource list and generate the corresponding regexp part. """
 
+
+    def loadlist(self, path):
+        """ Load a resource list and generate the corresponding regexp part.
+
+        """
         # Reading the input file sequentially
         for line in codecs.open(path, 'r', 'utf-8'):
             # Get the word
             word = line.strip().lower()
             # Add the word to the lexicon
             self.lexicon[word] = 1
-    #-B-----------------------------------------------------------------------B-
-
-#~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-# ]
-#~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
-
 
 
 
