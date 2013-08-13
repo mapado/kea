@@ -65,6 +65,9 @@ class Tokenizer(object):
 
         self.loadlist(self.resources+'abbrs-wikipedia.list')
 
+    def __call__(self, text):
+        return self.tokenize(text)
+
     def tokenize(self, text):
         """
         Tokenize the sentence given in parameter and return a list of tokens.
